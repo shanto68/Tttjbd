@@ -1,66 +1,121 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-
+<html>
 <head>
-  <!-- Metadata -->
-  <meta charset="utf-8" />
-  <meta name="author" content="Jacob Strieb" />
-  <meta name="description" content="Password protect links using AES in the browser." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Number Display Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #D4E9BF;
+        }
 
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+        form {
+            margin-top: 20px;
+        }
 
-  <title>Link Lock - Password-protect links</title>
+        input[type="submit"] {
+            padding: 45px 95px;
+            margin: 10px;
+            font-size: 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css" type="text/css" />
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
 
-  <!-- Scripts -->
-  <script type="text/javascript" src="b64.js"></script>
-  <script type="text/javascript" src="api.js"></script>
-  <script type="text/javascript" src="index.js"> </script>
+        .history {
+            margin-top: 50px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .history p {
+            font-size: 65px;
+        }
+
+        .clear-button {
+            margin-top: 20px;
+        }
+
+        .clear-button input[type="submit"] {
+            background-color: #f44336;
+            padding: 30px 60px;
+            font-size: 20px;
+            border-radius: 8px;
+        }
+
+        .clear-button input[type="submit"]:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
+<body>
 
-<body onload="main()">
-  <!-- Explanation for those who do not have JavaScript enabled -->
-  <noscript>
-  <div class="red-border">
-    <p>If you are seeing this, it means that you have JavaScript disabled. Please enable JavaScript to access the locked link.</p>
+<form method="post">
+    <input type="submit" name="number" value="0">
+    <input type="submit" name="number" value="1">
+    <input type="submit" name="number" value="2">
+    <input type="submit" name="number" value="3">
+    <input type="submit" name="number" value="4">
+    <input type="submit" name="number" value="5">
+    <input type="submit" name="number" value="6">
+    <input type="submit" name="number" value="7">
+    <input type="submit" name="number" value="8">
+    <input type="submit" name="number" value="9">
+</form>
 
-    <p>This application is entirely programmed in JavaScript. This was done intentionally, so that all encryption and decryption happens client-side. This means the code runs as a distributed application, relying only on GitHub Pages for infrastructure. It also means that no data about locked links is ever stored on a server. The code is designed to be auditable so users can investigate what is happening behind the scenes.</p>
+<?php
+$numbers = array(
+    "0" => "0-30-10-20",
+    "1" => "21-1-31-11",
+    "2" => "2-32-12-22",
+    "3" => "3-33-13-23",
+    "4" => "34-4-24-14",
+    "5" => "5-25-15-35",
+    "6" => "26-16-6-36",
+    "7" => "7-17-27",
+    "8" => "28-8-18",
+    "9" => "19-9-29"
+);
 
-    <p>If you still want to run the application, I encourage you to clone the <a href="https://github.com/jstrieb/link-lock">source code on GitHub</a>. That way you can disable JavaScript only for trusted files on your local machine.</p>
-  </div>
-  </noscript>
+session_start();
 
-  <div class="form" style="display: none">
-    <p>Please enter the password to unlock the link.</p>
-    <p id="hint"></p>
+if (!isset($_SESSION['history'])) {
+    $_SESSION['history'] = array();
+}
 
-    <hr />
+if (isset($_POST['number'])) {
+    $selected_number = $_POST['number'];
+    if (array_key_exists($selected_number, $numbers)) {
+        array_push($_SESSION['history'], $numbers[$selected_number]);
+    }
+}
 
-    <label for="password">password</label>
-    <input type="password" id="password" autofocus />
-    <button id="unlockbutton">Unlock link</button>
-  </div>
+if (isset($_POST['clear'])) {
+    $_SESSION['history'] = array();
+}
 
+if (!empty($_SESSION['history'])) {
+    echo "<div class='history'>";
+    echo "<h3>History:</h3>";
+    foreach ($_SESSION['history'] as $item) {
+        echo "<p>" . $item . "</p>";
+    }
+    echo "</div>";
+}
 
+?>
 
+<form method="post" class="clear-button">
+    <input type="submit" name="clear" value="Clear History">
+</form>
 
-
-
-
-
-
-
-  <!-- Display errors in a big red box -->
-  <div class="error red-border" style="display: none">
-    <p id="errortext">Error</p>
-    <button onclick="main()">Try again</button>
-    <a href="https://jstrieb.github.io/link-lock"><button>Lock a link</button></a>
-    <a href="https://jstrieb.github.io/link-lock/decrypt/" id="no-redirect" target="_blank"><button>Decrypt without redirect</button></a>
-    <a href="https://jstrieb.github.io/link-lock/hidden/" id="hidden" target="_blank"><button>Create hidden bookmark</button></a>
-  </div>
 </body>
-
 </html>
